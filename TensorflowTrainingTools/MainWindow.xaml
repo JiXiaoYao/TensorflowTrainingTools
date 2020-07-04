@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Button x:Name="DataProcessing" Content="一键处理训练数据" HorizontalAlignment="Left" Margin="43,44,0,0" VerticalAlignment="Top" Height="36" Width="146" Click="DataProcessing_Click"/>
+        <Label x:Name="Infomation" Content="" HorizontalAlignment="Left" Margin="43,106,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

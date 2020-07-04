@@ -1,23 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Text.Unicode;
+using System.Windows.Documents;
 using System.Xml;
 
 namespace TensorflowTrainingTools
 {
-    class Helper
+    public class Helper
     {
         public string BasePath { set; get; }
-        public Helper(string path)
+        public string pythonPath { set; get; }
+        public Helper(string path, string python)
         {
             BasePath = Path.GetFullPath(path);
             if (BasePath.Last() == '\\')
                 BasePath = BasePath.Substring(0, BasePath.Length - 2);
             if (BasePath.Last() == '/')
                 BasePath = BasePath.Substring(0, BasePath.Length - 2);
+            pythonPath = python;
         }
         /// <summary>
         /// 创建数据缓存
@@ -44,7 +49,7 @@ namespace TensorflowTrainingTools
                         Datas.Add(MainName, new List<string[]>());                                                                // 则添加
                     if (File.Exists(ProcessingPath + "/" + $"{Name}.xml"))                                                        // 判断同名的XML配置文件是否存在
                     {
-                                                                                                                                  // 如果存在则加入字典数组
+                        Datas[MainName].Add(new string[] { $"{Name}.{ExtensionName}", $"{Name}.xml" });                           // 如果存在则加入字典数组
                     }
                 }
             }
@@ -58,7 +63,7 @@ namespace TensorflowTrainingTools
                         relativePath = "Cache/Train";
                     else
                         relativePath = "Cache/Test";
-                                                                                                                                  // 复制图片与XML配置文件
+                    File.Copy($"{ProcessingPath}/{Datas[key][i][0]}", $"{ProcessingPath}/{relativePath}/{Datas[key][i][0]}");     // 复制图片与XML配置文件
                     File.Copy($"{ProcessingPath}/{Datas[key][i][1]}", $"{ProcessingPath}/{relativePath}/{Datas[key][i][1]}");
                 }
         }
@@ -73,7 +78,7 @@ namespace TensorflowTrainingTools
             {
                 XmlDocument xmlDoc = new XmlDocument();                                                                           // 实例化XML对象
                 xmlDoc.Load(xml);                                                                                                 // 加载XML文件
-                                                                                                                                  // 遍历XML中名为object的节点
+                foreach (XmlNode obj in xmlDoc.SelectSingleNode("annotation").SelectNodes("object"))                              // 遍历XML中名为object的节点
                 {
                     var name = obj.SelectSingleNode("name");                                                                      // 获取名字
                     if (!Names.Contains(name.InnerText))                                                                          // 如果该标签名不在数组中
@@ -92,6 +97,44 @@ namespace TensorflowTrainingTools
             if (!Directory.Exists(BasePath + "/annotations"))                                                                     // 判断annotations目录是否不存在
                 Directory.CreateDirectory(BasePath + "/annotations");                                                             // 则创建
             File.WriteAllText(BasePath + "/annotations/label_map.pbtxt", pbtxt);                                                  // 写入文件
+        }
+        /// <summary>
+        /// Xml转Csv
+        /// </summary>
+        public void XmlToCSV()
+        {
+            RunPythonScript("script/xml_to_csv.py -i imageData/Cache/Train -o annotations/train_labels.csv", BasePath);// 调用脚本
+            RunPythonScript("script/xml_to_csv.py -i imageData/Cache/Test -o annotations/test_labels.csv", BasePath);
+        }
+        /// <summary>
+        /// Csv转储TFRecord
+        /// </summary>
+        public void CsvToTFRecord()
+        {
+            RunPythonScript("script/generate_tfrecord.py --csv_input=annotations/train_labels.csv --output_path=annotations/train.record --img_path=imageData/Cache/Train", BasePath); // 调用脚本
+            RunPythonScript("script/generate_tfrecord.py --csv_input=annotations/test_labels.csv --output_path=annotations/test.record --img_path=imageData/Cache/Test", BasePath);
+        }
+        public void DeleteCache()
+        {
+            Directory.Delete(BasePath + "/imageData/Cache", true);// 删除缓存目录
+        }
+        /// <summary>
+        /// 运行Python脚本
+        /// </summary>
+        /// <param name="Arguments">参数</param>
+        /// <param name="WorkingDirectory">工作路径</param>
+        /// <returns></returns>
+        public string RunPythonScript(string Arguments, string WorkingDirectory)
+        {
+            Process python = new Process();
+            python.StartInfo.FileName = pythonPath;
+            python.StartInfo.Arguments = Arguments;
+            python.StartInfo.WorkingDirectory = WorkingDirectory;
+            python.StartInfo.RedirectStandardOutput = true;
+            python.StartInfo.CreateNoWindow = true;
+            python.Start();
+            while (!python.HasExited) { }
+            return python.StandardOutput.ReadToEnd();
         }
         #region ToolFunction
         private List<T> RandomSort<T>(List<T> list)
