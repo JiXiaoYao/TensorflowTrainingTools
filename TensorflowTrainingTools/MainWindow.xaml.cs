@@ -28,6 +28,7 @@ namespace TensorflowTrainingTools
         {
             InitializeComponent();
             helper = new Helper(@"C:\Users\16668\Desktop\workPath", "python");
+            helper.ReleaseScript();
             //helper.CreateCache();
             //helper.CreatePbtxt();
             //helper.XmlToCSV();

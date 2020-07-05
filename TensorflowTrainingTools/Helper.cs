@@ -9,6 +9,7 @@ using System.Text.Unicode;
 using System.Windows.Documents;
 using System.Xml;
 
+
 namespace TensorflowTrainingTools
 {
     public class Helper
@@ -103,16 +104,16 @@ namespace TensorflowTrainingTools
         /// </summary>
         public void XmlToCSV()
         {
-            RunPythonScript("script/xml_to_csv.py -i imageData/Cache/Train -o annotations/train_labels.csv", BasePath);// 调用脚本
-            RunPythonScript("script/xml_to_csv.py -i imageData/Cache/Test -o annotations/test_labels.csv", BasePath);
+            RunPythonScript("scripts/xml_to_csv.py -i imageData/Cache/Train -o annotations/train_labels.csv", BasePath);// 调用脚本
+            RunPythonScript("scripts/xml_to_csv.py -i imageData/Cache/Test -o annotations/test_labels.csv", BasePath);
         }
         /// <summary>
         /// Csv转储TFRecord
         /// </summary>
         public void CsvToTFRecord()
         {
-            RunPythonScript("script/generate_tfrecord.py --csv_input=annotations/train_labels.csv --output_path=annotations/train.record --img_path=imageData/Cache/Train", BasePath); // 调用脚本
-            RunPythonScript("script/generate_tfrecord.py --csv_input=annotations/test_labels.csv --output_path=annotations/test.record --img_path=imageData/Cache/Test", BasePath);
+            RunPythonScript("scripts/generate_tfrecord.py --csv_input=annotations/train_labels.csv --output_path=annotations/train.record --img_path=imageData/Cache/Train", BasePath); // 调用脚本
+            RunPythonScript("scripts/generate_tfrecord.py --csv_input=annotations/test_labels.csv --output_path=annotations/test.record --img_path=imageData/Cache/Test", BasePath);
         }
         public void DeleteCache()
         {
@@ -135,6 +136,17 @@ namespace TensorflowTrainingTools
             python.Start();
             while (!python.HasExited) { }
             return python.StandardOutput.ReadToEnd();
+        }
+        public void ReleaseScript()
+        {
+            if (!Directory.Exists(BasePath + "/scripts"))
+                Directory.CreateDirectory(BasePath + "/scripts");
+            string generate_tfrecord = Encoding.UTF8.GetString((byte[])TensorflowTrainingTools.Resources.Scripts.ResourceManager.GetObject("generate_tfrecord"));
+            File.WriteAllText(BasePath + "/scripts/generate_tfrecord.py", generate_tfrecord);
+            string model_main = Encoding.UTF8.GetString((byte[])TensorflowTrainingTools.Resources.Scripts.ResourceManager.GetObject("model_main"));
+            File.WriteAllText(BasePath + "/scripts/model_main.py", model_main);
+            string xml_to_csv = Encoding.UTF8.GetString((byte[])TensorflowTrainingTools.Resources.Scripts.ResourceManager.GetObject("xml_to_csv"));
+            File.WriteAllText(BasePath + "/scripts/xml_to_csv.py", xml_to_csv);
         }
         #region ToolFunction
         private List<T> RandomSort<T>(List<T> list)
