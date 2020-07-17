@@ -25,6 +25,7 @@ namespace TensorflowTrainingTools
                 BasePath = BasePath.Substring(0, BasePath.Length - 2);
             pythonPath = python;
         }
+        #region AutoTFRecod
         /// <summary>
         /// 创建数据缓存
         /// </summary>
@@ -137,6 +138,37 @@ namespace TensorflowTrainingTools
             while (!python.HasExited) { }
             return python.StandardOutput.ReadToEnd();
         }
+        #endregion
+
+        public List<Box> GetLabelFromXml(string FilePath)
+        {
+            List<Box> boxes = new List<Box>();
+            XmlDocument xmlDoc = new XmlDocument();                                                                           // 实例化XML对象
+            xmlDoc.Load(FilePath);                                                                                                 // 加载XML文件
+            foreach (XmlNode obj in xmlDoc.SelectSingleNode("annotation").SelectNodes("object"))                              // 遍历XML中名为object的节点
+            {
+                var name = obj.SelectSingleNode("name");                                                                      // 获取名字
+                var bndbox = obj.SelectSingleNode("bndbox");
+                boxes.Add(new Box()
+                {
+                    Name = name.InnerText,
+                    xmin = int.Parse(bndbox.SelectSingleNode("xmin").InnerText),
+                    ymin = int.Parse(bndbox.SelectSingleNode("ymin").InnerText),
+                    xmax = int.Parse(bndbox.SelectSingleNode("xmax").InnerText),
+                    ymax = int.Parse(bndbox.SelectSingleNode("ymax").InnerText)
+                });
+            }
+            return boxes;
+        }
+        public class Box
+        {
+            public string Name { set; get; }
+            public int xmin { set; get; }
+            public int ymin { set; get; }
+            public int xmax { set; get; }
+            public int ymax { set; get; }
+        }
+
         public void ReleaseScript()
         {
             if (!Directory.Exists(BasePath + "/scripts"))

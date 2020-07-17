@@ -5,10 +5,131 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TensorflowTrainingTools"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="TensorflowTrainingTools" Height="575" Width="1102" 
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:dockablz="http://dragablz.net/winfx/xaml/dockablz"
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+     
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        WindowStartupLocation="CenterScreen" WindowStyle="None">
+    <WindowChrome.WindowChrome>
+        <WindowChrome />
+    </WindowChrome.WindowChrome>
     <Grid>
-        <Button x:Name="DataProcessing" Content="一键处理训练数据" HorizontalAlignment="Left" Margin="43,44,0,0" VerticalAlignment="Top" Height="36" Width="146" Click="DataProcessing_Click"/>
-        <Label x:Name="Infomation" Content="" HorizontalAlignment="Left" Margin="43,106,0,0" VerticalAlignment="Top"/>
+        <Grid Height="60" VerticalAlignment="Top" Background="#FF9C27B0" x:Name="TitleBar" MouseMove="TitleBar_MouseMove" >
+            <TextBlock Text="Tensorflow Training Tools" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontFamily="Champagne &amp; Limousines" />
+            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Click="CloseThisWindow">
+                <materialDesign:PackIcon Kind="Power"/>
+            </Button>
+        </Grid>
 
+        <Grid Margin="0 60 0 0">
+            <dockablz:Layout Background="White">
+                <!--<dragablz:TabablzControl>-->
+                <dragablz:TabablzControl>
+                    <!--<dragablz:TabablzControl.InterTabController>
+                        <dragablz:InterTabController />
+                    </dragablz:TabablzControl.InterTabController>-->
+                    <TabItem Header="批量生成XML">
+                        <Grid >
+                            <Grid Margin="10,10,10,0" Height="60" VerticalAlignment="Top" >
+                                <materialDesign:Card Height="60">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="141*"/>
+                                            <ColumnDefinition Width="386*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition Height="2*"/>
+                                        </Grid.RowDefinitions>
+                                        <Label Content="图片所在目录:" HorizontalAlignment="Left" Margin="10,0,0,20" Grid.Row="1"  />
+                                        <TextBox Name="rawImagePath" Margin="245,10,10,10"  Text="Click to choose" FontSize="20" TextWrapping="Wrap"  GotFocus="ChooseImgFilePath_Click" Grid.RowSpan="2" Grid.Column="1" />
+                                        <Button Content="..." Margin="0,14,10,14" Name="ChooseImgFilePath" Click="ChooseImgFilePath_Click" RenderTransformOrigin="-0.231,0.433" HorizontalAlignment="Right"  Grid.RowSpan="2" Grid.Column="1"/>
+                                    </Grid>
+                                    <!--<materialDesign:Card.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard TargetName="DropShadowEffect">
+                                                    <DoubleAnimation Storyboard.TargetProperty="BlurRadius" To="25" Duration="0:0:0.5" />
+                                                    <DoubleAnimation Storyboard.TargetProperty="ShadowDepth" To="8" Duration="0:0:0.5" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="FrameworkElement.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard TargetName="DropShadowEffect">
+                                                    <DoubleAnimation Storyboard.TargetProperty="BlurRadius" To="5" Duration="0:0:0.5" />
+                                                    <DoubleAnimation Storyboard.TargetProperty="ShadowDepth" To="1" Duration="0:0:0.5" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </materialDesign:Card.Triggers>
+                                    <materialDesign:Card.Effect>
+                                        <DropShadowEffect x:Name="DropShadowEffect" BlurRadius="5" ShadowDepth="1" Direction="270" Color="{StaticResource MaterialDesignShadow}" Opacity=".42" RenderingBias="Performance" />
+                                    </materialDesign:Card.Effect>-->
+                                </materialDesign:Card>
+                            </Grid>
+                            <Grid Margin="10,80,10,0" Height="61" VerticalAlignment="Top">
+                                <materialDesign:Card   Height="60" VerticalAlignment="Top">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="140*"/>
+                                            <ColumnDefinition Width="387*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="样板XML文件路径:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="24" Width="111"/>
+                                        <TextBox Name="XmlModelPath" Margin="247,10,10,10" FontSize="20" Text="Click to choose" TextWrapping="Wrap" Grid.Column="1" GotFocus="ChooseXmlModel_Click"/>
+                                        <Button Name="ChooseXmlModel" Content="..." Margin="0,13,9,15" Grid.Column="1" RenderTransformOrigin="0.625,0.188" Click="ChooseXmlModel_Click" HorizontalAlignment="Right" Cursor="Hand"/>
+                                    </Grid>
+                                </materialDesign:Card >
+                            </Grid>
+                            <Grid Margin="10,160,10,0" Height="61" VerticalAlignment="Top">
+                                <materialDesign:Card   Height="60" VerticalAlignment="Top">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="140*"/>
+                                            <ColumnDefinition Width="387*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="输出文件夹:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="24" Width="111"/>
+                                        <TextBox Name="XmlPngOutPutPath" Margin="247,10,10,10" FontSize="20" Text="Click to choose" TextWrapping="Wrap" Grid.Column="1" GotFocus="ChooseOutPutPath_Click"/>
+                                        <Button Name="ChooseOutPutPath" Content="..." Margin="0,13,9,15" Grid.Column="1" RenderTransformOrigin="0.625,0.188" HorizontalAlignment="Right" Cursor="Hand" Click="ChooseOutPutPath_Click"/>
+                                    </Grid>
+                                </materialDesign:Card >
+                            </Grid>
+                            <Button Content="点击批量生成" Margin="10,237,10,0" VerticalAlignment="Top" Click="GenerateXml"/>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="检查批量结果">
+                        <Grid Background="#FFE5E5E5">
+                            <Grid Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+                                <Grid Margin="0,0,264,0">
+                                    <Image x:Name="ImageShow" Margin="7,6,6,6"/>
+                                </Grid>
+                                <Grid HorizontalAlignment="Right" Width="259" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                                    <Button x:Name="LoadFolder" Content="载入文件夹" Margin="10,10,10,0" VerticalAlignment="Top" Height="40" Click="LoadFolder_Click"/>
+                                    <ListBox x:Name="FileList" Margin="10,55,10,0" Height="242" VerticalAlignment="Top" MouseUp="FileList_MouseUp" MouseDown="FileList_MouseDown" SelectionChanged="FileList_SelectionChanged" />
+                                </Grid>
+
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="一键生成TFRecord">
+                        <Grid>
+                            <Label x:Name="Infomation" Content="" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top"/>
+                            <Button x:Name="DataProcessing" Content="一键处理训练数据" Margin="10,95,10,0" VerticalAlignment="Top" Height="36" Click="DataProcessing_Click"/>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="训练">
+                        <Grid Background="#FFE5E5E5"/>
+                    </TabItem>
+                </dragablz:TabablzControl>
+            </dockablz:Layout>
+
+        </Grid>
     </Grid>
 </Window>
